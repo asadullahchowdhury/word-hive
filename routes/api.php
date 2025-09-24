@@ -2,7 +2,10 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\Api\Front\BlogController;
+use App\Http\Controllers\Api\Admin\AdminBlogController;
+use App\Http\Controllers\Api\Admin\AuthController;
+use App\Http\Middleware\CheckAdmin;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -14,6 +17,18 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+// Admin panel routes (protected)
+Route::prefix('admin')->group(function () {
+    Route::post('login', [AuthController::class, 'login']);
+
+    Route::middleware('checkAdmin')->group(function () {
+        Route::post('logout', [AuthController::class, 'logout']);
+        Route::get('me', [AuthController::class, 'me']);
+        Route::apiResource('blogs', AdminBlogController::class);
+    });
+});
+
+// Front panel routes (public)
+Route::prefix('front')->group(function () {
+    Route::apiResource('blogs', BlogController::class)->only(['index', 'show']);
 });
