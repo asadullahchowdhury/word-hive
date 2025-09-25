@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Blog;
+use App\Models\BlogImage;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Nette\Schema\ValidationException;
@@ -15,7 +16,7 @@ class AdminBlogController extends Controller
      */
     public function index()
     {
-        $blogs = Blog::latest()->get();
+        $blogs = Blog::with('images')->latest()->get();
         return response()->json($blogs);
     }
 
@@ -28,13 +29,35 @@ class AdminBlogController extends Controller
             'title' => 'required|string|max:255',
             'slug' => 'required',
             'description' => 'required',
-            'image' => 'required',
+            'images' => 'required|array',
+            'images.*' => 'file|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        Blog::create($request->all());
+
+        $blog = Blog::create([
+            'title' => $request->title,
+            'slug' => $request->slug,
+            'description' => $request->description,
+        ]);
+
+
+        $blogImages = [];
+        // Create image in related table
+        foreach ($request->images as $image) {
+            $imagePath = $image->store('blogs', 'public');
+            $blogImages[] = [
+                'blog_id' => $blog->id,
+                'image' => $imagePath
+            ];
+        }
+
+        if (count($blogImages) > 0) {
+            BlogImage::insert($blogImages);
+        }
+
         return response()->json([
             'message' => 'Blog created successfully',
-            'blog' => Blog::latest()->first(),
+            'blog' => $blog,
         ], 201);
 
     }
@@ -48,7 +71,7 @@ class AdminBlogController extends Controller
     public function show(string $id)
     {
         try {
-            $blog = Blog::findOrFail($id);
+            $blog = Blog::with('images')->findOrFail($id);
             return response()->json($blog);
         } catch (ModelNotFoundException $e) {
             return response()->json([
@@ -67,19 +90,28 @@ class AdminBlogController extends Controller
     {
         try {
             $blog = Blog::findOrFail($id);
-
             $data = $request->validate([
                 'title' => 'required|string|max:255',
                 'slug' => 'required|string|max:255',
                 'description' => 'required|string',
-                'image' => 'required|string',
+                'images' => 'required|array',
+                'images.*' => 'string',
             ]);
 
-            $blog->update($data);
+            $blog->update([
+                'title' => $data['title'],
+                'slug' => $data['slug'],
+                'description' => $data['description'],
+            ]);
+            if ($request->has('images')) {
+                foreach ($request->images as $image) {
+                    $blog->images()->create(['image' => $image,]);
+                }
+            }
 
             return response()->json([
                 'message' => 'Blog updated successfully',
-                'blog' => $blog
+                'blog' => $blog->load('images') // will return with related images
             ], 200);
 
         } catch (ModelNotFoundException $e) {

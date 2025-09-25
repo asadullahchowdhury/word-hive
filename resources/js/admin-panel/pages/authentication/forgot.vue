@@ -5,21 +5,17 @@
             <div class="flex justify-center mb-6">
                 <img class="w-30 object-contain" :src="`/images/logo.png`" alt="">
             </div>
-            <h2 class="text-xl font-bold mb-6 text-center text-cyan-900">Admin Login</h2>
+            <h2 class="text-xl font-bold mb-6 text-center text-cyan-900">Admin Forgot Password</h2>
             <form action="">
                 <div class="form-group mb-3">
-                    <input type="text" class="w-full rounded-2xl p-3 border transition-all duration-300 focus:ring ring-cyan-900 border-gray-300 outline-0 focus:border-green-950" placeholder="Username">
+                    <input type="email" class="w-full rounded-2xl p-3 border transition-all duration-300 focus:ring ring-cyan-900 border-gray-300 outline-0 focus:border-green-950" placeholder="Email">
                 </div>
-                <div class="form-group mb-3">
-                    <input type="password" class="w-full rounded-2xl p-3 border transition-all duration-300 focus:ring ring-cyan-900 border-gray-300 outline-0 focus:border-green-950" placeholder="Password">
-                </div>
-
                 <div class="">
-                    <button type="button" class="bg-cyan-900 hover:bg-cyan-950 transition-all duration-300 ease-in-out hover:scale-105 cursor-pointer w-full p-3 rounded-2xl text-white font-medium">Login </button>
+                    <button type="button" class="bg-cyan-900 hover:bg-cyan-950 transition-all duration-300 ease-in-out hover:scale-105 cursor-pointer w-full p-3 rounded-2xl text-white font-medium">Forgot</button>
                 </div>
 
+                <div class="my-5 text-center">Remember password? go to   <router-link :to="{name: 'admin.login'}" class="block hover:underline text-center font-medium text-cyan-900 ">Login page</router-link></div>
 
-                <a href="javascript:void(0)" class="block hover:underline text-center font-medium text-cyan-900 my-5">Forgot Password?</a>
             </form>
         </div>
     </div>

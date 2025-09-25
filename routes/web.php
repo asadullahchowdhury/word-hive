@@ -12,7 +12,12 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-// routes/web.php
+// Protect all /admin routes with your Bearer token middleware
+Route::get('/admin/{any}', function () {
+    return view('app'); // same Vue app file
+})->where('any', '.*');
+
+// Public routes for the frontend
 Route::get('/{any}', function () {
-    return view('app'); // this will load Vue
+    return view('app');
 })->where('any', '.*');

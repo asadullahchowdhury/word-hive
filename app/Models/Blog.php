@@ -12,4 +12,10 @@ class Blog extends Model
         'description',
         'image',
     ];
+
+    public function images()
+    {
+        return $this->hasMany(BlogImage::class);
+    }
+
 }
